@@ -831,16 +831,31 @@ def checkers(n, up_left=True):
     l = np.arange(n*n)
     l = np.reshape(l,(n,n))
     return f(l,up_left,n)
+
+def checkers2(n,up_left=True):
+    l = np.zeros(n*n)
+    if up_left:
+        debut = 1
+    else:
+        debut = 0
+    if n %2 == 1:
+        l[debut::2] = 1
+        return l.reshape((n,n)).astype(int)
+    else:
+        l = l.reshape((n,n))
+        l[::2, debut::2] = 1
+        l[1::2, 1-debut::2] = 1
+        return l.astype(int)
 ```
 
 ```{code-cell} ipython3
 # pour tester
 
-checkers(8)
+checkers2(8)
 ```
 
 ```{code-cell} ipython3
-checkers(5, True)
+checkers2(5, True)
 ```
 
 +++ {"tags": ["level_advanced"]}
