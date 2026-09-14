@@ -751,7 +751,24 @@ M
 
 Écrivez une fonction `zebre`, qui prend en argument un entier *n* et qui fabrique un tableau carré de coté `n`, formé d'une alternance de colonnes de 0 et de colonnes de 1.
 
-+++
+```{code-cell} ipython3
+@np.vectorize
+def f(m):
+    if m % 2 == 0:
+        return 0
+    else:
+        return 1
+
+def zebre(n):
+    l = np.arange(n*n)
+    l = np.reshape(l,(n,n))
+    return f(l)
+    
+```
+
+```{code-cell} ipython3
+print(zebre(4))
+```
 
 par exemple pour `n=4` on s'attend à ceci
 
@@ -789,19 +806,41 @@ array([[0, 1, 0, 1, 0],
 
 ```{code-cell} ipython3
 # a vous de jouer
-
+@np.vectorize
+def f(elt, up_left,n):
+    if n % 2 == 0:
+        #affichage par diagonales
+        val = elt + elt//n
+        if not up_left:
+            val += 1
+        if val % 2 == 0:
+            return 1
+        return 0
+    else:
+        # pas besoin de faire une icrementation, l'imparite de n fait que le decalage de ligne en ligne est autmotaique avec la methode suivante
+        if up_left == True:
+            if elt % 2 == 0:
+                return 1
+            return 0
+        else:
+            if elt % 2 == 1:
+                return 1
+            return 0
+        
 def checkers(n, up_left=True):
-    pass
+    l = np.arange(n*n)
+    l = np.reshape(l,(n,n))
+    return f(l,up_left,n)
 ```
 
 ```{code-cell} ipython3
 # pour tester
 
-checkers(4)
+checkers(8)
 ```
 
 ```{code-cell} ipython3
-checkers(5, False)
+checkers(5, True)
 ```
 
 +++ {"tags": ["level_advanced"]}
@@ -843,8 +882,24 @@ array([[0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1],
 
 #  vous de jouer
 
+@np.vectorize
+def f(elt, n, k):
+    taille = n * k
+    i = elt // taille
+    j = elt % taille
+    # determine le bloc dans lequel sera l'elt, 0 en haut a gauche, 1 en diagonale et 2 en bas a droite
+    bloc_i = (i // k) % 2 
+    bloc_j = (j // k) % 2
+    if (bloc_i + bloc_j) % 2 == 0:
+        return 0
+    else:
+        return 1
+
 def block_checkers(n, k):
-    pass
+    l = np.arange(n * n * k * k)
+    l = np.reshape(l, (n * k, n * k))
+    return f(l, n, k)
+    
 ```
 
 ```{code-cell} ipython3
@@ -891,9 +946,11 @@ array([[0, 1, 2, 3, 4, 3, 2, 1, 0],
 
 ```{code-cell} ipython3
 # à vous de jouer
-
+# On va juste calculer la distance de chaque case au centre de la figure.    
 def stairs(n):
-    pass
+    i,j = np.indices((2*n+1,2*n+1))
+    distance = np.abs(n-i) + np.abs(n-j)
+    return 2*n - distance 
 ```
 
 ```{code-cell} ipython3
