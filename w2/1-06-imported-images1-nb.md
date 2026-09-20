@@ -172,7 +172,7 @@ print(img2.shape)
 6. Quelle est la taille de l'image en hauteur et largeur ?
 
 ```{code-cell} ipython3
-La hauteur vaut 533 et la largeur 800.
+"La hauteur vaut 533 et la largeur 800."
 ```
 
 7. Quel est le nombre d'octets utilisé par pixel ?
@@ -378,19 +378,22 @@ plt.imshow(img14)
 1. Relire l'image initiale (sans la copier)
 
 ```{code-cell} ipython3
-# votre code
+img15 = plt.imread("data/les-mines.jpg")
 ```
 
 2. Créez un tableau vide de la même hauteur et largeur que l'image, du type de l'image initiale, mais avec un quatrième canal
 
 ```{code-cell} ipython3
-# votre code
+haut,larg = img15.shape[:2]
+img15_copy = np.empty((haut, larg,4), dtype=np.uint8)
 ```
 
 3. Copiez-y l'image initiale, mettez le quatrième canal à `128` et affichez l'image
 
 ```{code-cell} ipython3
-# votre code
+img15_copy[:,:,:3] = img15[:,:,:]
+img15_copy[:,:,3] = 128
+plt.imshow(img15_copy)
 ```
 
 ## image en niveaux de gris en `float`
@@ -400,13 +403,14 @@ plt.imshow(img14)
 1. Relire l'image `data/les-mines.jpg`
 
 ```{code-cell} ipython3
-# votre code
+img16 = plt.imread("data/les-mines.jpg")
 ```
 
 2. Passez ses valeurs en flottants entre 0 et 1 et affichez-la
 
 ```{code-cell} ipython3
-# votre code
+img16_0 = img16/255
+plt.imshow(img16_0)
 ```
 
 3. Transformer l'image en deux images en niveaux de gris :  
@@ -416,26 +420,56 @@ b. en utilisant la correction `Y` (qui corrige le constrate) basée sur la formu
 c. optionnel: si vous pensez à plusieurs façons de faire la question a., utilisez `%%timeit` pour les benchmarker et choisir la plus rapide
 
 ```{code-cell} ipython3
-# votre code
+img16_copy1 = img16_0.sum(axis=2) / 3
+print(type(img16_copy1))
+x1 = np.max(img16_copy1)
+plt.imshow(img16_copy1, cmap='gray', vmin=0, vmax=x1)
+plt.colorbar()
+plt.show()
+img16_copy2 = np.empty((haut,larg), dtype=float)
+img16_copy2[:,:] = img16_0[:,:,0] * 0.299 + img16_0[:,:,1] * 0.587 + img16_0[:,:,2] * 0.114
+x2 = np.max(img16_copy2)
+plt.imshow(img16_copy2, cmap='gray', vmin=0, vmax=x2)
+plt.colorbar()
+plt.show()
 ```
 
 4. Prenez l'image de 3.a (moyenne des 3 canaux), passez les pixels au carré, et affichez le résultat
    Quel est l'effet sur l'image ?
 
 ```{code-cell} ipython3
-# votre code
+img16_copy3 = img16_copy1**2
+x3 = np.max(img16_copy3[:,:])
+print(x3)
+plt.imshow(img16_copy3, cmap='gray', vmin=0, vmax=x3)
+plt.colorbar()
+plt.show()
+"L'image se noircit car les pixels bas sont rapprochés de 0 alors que les pixels hauts restent près de 1 à cause du caractère convexe de la fonction carré. On a donc un plus gros écart entre les deux types de pixels, d'où le noircissement de l'image"
 ```
 
 5. Pareil, mais cette fois utilisez la racine carrée; quel effet cette fois ?
 
 ```{code-cell} ipython3
-# votre code
+img16_copy4 = np.sqrt(img16_copy1)
+x4 = np.max(img16_copy4[:,:])
+print(x4)
+plt.imshow(img16_copy4, cmap='gray', vmin=0, vmax=x3)
+plt.colorbar()
+plt.show()
+"Cette fois-ci au contraire, l'image s'éclaicit. Les pixels hauts sont rapprochés de 1 et les pixels hauts restent près de 1 à cause du caractère concave de la racine carrée., on a donc un plus faible écart entre les deux types de pixels, d'où l'éclaicissement de l'image"
 ```
 
 6. Convertissez l'image (de 3.a toujours) en type entier, et affichez la
 
 ```{code-cell} ipython3
-# votre code
+img16_copy1 = img16_0.sum(axis=2) / 3
+img17 = img16_copy1.astype(np.uint8)
+print(img17.dtype)
+x1 = np.max(img17)
+plt.imshow(img17, cmap='gray', vmin=0, vmax=x1)
+plt.colorbar()
+plt.show()
+"On observe une image noire, la conversion de float vers uint8 renvoit un tableau ne contenant que des 0 ou des 1 arrondis à l'inférieur. La quasi-totalité des valeurs étaient plus petites que 1, on a donc une image avec que des 0"
 ```
 
 ## affichage grille de figures
@@ -542,7 +576,18 @@ Reprenez les trois images en niveau de gris que vous aviez produites ci-dessus:
    ```
 
 ```{code-cell} ipython3
-# votre code
+fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+axes[0].imshow(img16_copy1, cmap="gray", vmin=0, vmax=x1)
+axes[0].set_title("A : Moyenne RGB")
+axes[0].axis("off")
+axes[1].imshow(img16_copy2, cmap="gray", vmin=0, vmax=x2)
+axes[1].set_title("B : Correction Y")
+axes[1].axis("off")
+axes[2].imshow(img16_copy4, cmap="gray", vmin=0, vmax=x3)
+axes[2].set_title("C : Racine carrée")
+axes[2].axis("off")
+plt.tight_layout()
+plt.show()
 ```
 
 2. Affichez-les en damier:
@@ -553,5 +598,42 @@ Reprenez les trois images en niveau de gris que vous aviez produites ci-dessus:
    ```
 
 ```{code-cell} ipython3
-# votre code
+fig, axes = plt.subplots(3, 3, figsize=(15, 5))
+
+axes[0][0].imshow(img16_copy1, cmap="gray", vmin=0, vmax=x1)
+axes[0][0].set_title("A : Moyenne RGB")
+axes[0][0].axis("off")
+axes[0][1].imshow(img16_copy2, cmap="gray", vmin=0, vmax=x2)
+axes[0][1].set_title("B : Correction Y")
+axes[0][1].axis("off")
+axes[0][2].imshow(img16_copy4, cmap="gray", vmin=0, vmax=x3)
+axes[0][2].set_title("C : Racine carrée")
+axes[0][2].axis("off")
+
+axes[1][2].imshow(img16_copy1, cmap="gray", vmin=0, vmax=x1)
+axes[1][2].set_title("A : Moyenne RGB")
+axes[1][2].axis("off")
+axes[1][0].imshow(img16_copy2, cmap="gray", vmin=0, vmax=x2)
+axes[1][0].set_title("B : Correction Y")
+axes[1][0].axis("off")
+axes[1][1].imshow(img16_copy4, cmap="gray", vmin=0, vmax=x3)
+axes[1][1].set_title("C : Racine carrée")
+axes[1][1].axis("off")
+
+axes[2][1].imshow(img16_copy1, cmap="gray", vmin=0, vmax=x1)
+axes[2][1].set_title("A : Moyenne RGB")
+axes[2][1].axis("off")
+axes[2][2].imshow(img16_copy2, cmap="gray", vmin=0, vmax=x2)
+axes[2][2].set_title("B : Correction Y")
+axes[2][2].axis("off")
+axes[2][0].imshow(img16_copy4, cmap="gray", vmin=0, vmax=x3)
+axes[2][0].set_title("C : Racine carrée")
+axes[2][0].axis("off")
+
+plt.tight_layout()
+plt.show()
+```
+
+```{code-cell} ipython3
+
 ```
