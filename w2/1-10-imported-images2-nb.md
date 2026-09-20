@@ -5,16 +5,12 @@ jupytext:
   text_representation:
     extension: .md
     format_name: myst
+    format_version: 0.13
+    jupytext_version: 1.19.5
 kernelspec:
   display_name: Python 3 (ipykernel)
   language: python
   name: python3
-language_info:
-  name: python
-  pygments_lexer: ipython3
-  nbconvert_exporter: python
-nbhosting:
-  title: suite du TP simple avec des images
 ---
 
 # TP images (2/2)
@@ -379,8 +375,6 @@ et dont voici un exemple d'utilisation:
 ````
 
 ```{code-cell} ipython3
-:scrolled: true
-
 # exemple de produit de matrices avec `numpy.dot`
 # le help(np.dot) dit: dot(A, B)[i,j,k,m] = sum(A[i,j,:] * B[k,:,m])
 
@@ -567,22 +561,22 @@ l'image lue par `Image.open` avec `save` et une `quality=100`
 (`save` s'applique à l'objet créé par `Image.open`)
 
 ```{code-cell} ipython3
-plt.imsave("img4.png",img4)
-img5.save("img5.jpg", quality = 100)
+plt.imsave("img5.png",img5)
+img4.save("img4.jpg", quality=100)
 ```
 
 6. Quelles sont les tailles de ces deux fichiers sur votre disque ?  
 Que constatez-vous ?
 
 ```{code-cell} ipython3
-img4 (qui provient de .imsave) est beaucoup plus lourde (1123Ko) que img5 (qui vient de .save) qui pèse (560Ko).
+"img4 (qui provient de .imsave) est beaucoup plus lourde (1123Ko) que img5 (qui vient de .save) qui pèse (560Ko)."
 ```
 
 7. Relisez les deux fichiers créés et affichez avec `plt.imshow` leur différence
 
 ```{code-cell} ipython3
-img_png = plt.imread("img4.png")
-img_jpg = plt.imread("img5.jpg")
+img_png = plt.imread("img5.png")
+img_jpg = plt.imread("img4.jpg")
 if img_png.dtype != np.uint8:
     img_png = (img_png[:, :, :3] * 255).astype(float)
 else:
