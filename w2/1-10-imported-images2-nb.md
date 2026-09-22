@@ -172,10 +172,14 @@ def patchwork(colors, side=10, background=[169, 169, 169]):
     """
     # your code here
     n = len(colors)
+    colors1 = np.empty((n + 1,3), dtype=np.uint8)
+    colors1[:n] = colors
+    colors1[n] = background
     (i,j) = rectangle_size(n)
     pattern = np.arange(i*j).reshape((i,j))
-    pattern = np.where(pattern >= n-1, n-1, pattern)
-    plt.imshow(colors[pattern])
+    pattern = np.where(pattern >= n, n, pattern)
+    pattern = pattern.astype(np.uint8)
+    plt.imshow(colors1[pattern])
 ```
 
 ```{code-cell} ipython3
@@ -333,7 +337,8 @@ plt.imsave("patchwork.png", img)
    attention si votre image vous semble floue c'est juste que l'affichage grossit vos pixels
 
 ```{code-cell} ipython3
-# votre code
+img = plt.imread("patchwork.png")
+plt.imshow(img)
 ```
 
 vous devriez obtenir quelque chose comme ceci
@@ -562,7 +567,7 @@ l'image lue par `Image.open` avec `save` et une `quality=100`
 
 ```{code-cell} ipython3
 plt.imsave("img5.png",img5)
-img4.save("img4.jpg", quality=100)
+img4.save("img4.jpg", quality = 100)
 ```
 
 6. Quelles sont les tailles de ces deux fichiers sur votre disque ?  
@@ -575,8 +580,8 @@ Que constatez-vous ?
 7. Relisez les deux fichiers créés et affichez avec `plt.imshow` leur différence
 
 ```{code-cell} ipython3
-img_png = plt.imread("img5.png")
-img_jpg = plt.imread("img4.jpg")
+img_png = plt.imread("img4.png")
+img_jpg = plt.imread("img5.jpg")
 if img_png.dtype != np.uint8:
     img_png = (img_png[:, :, :3] * 255).astype(float)
 else:
