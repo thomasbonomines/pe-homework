@@ -1071,7 +1071,9 @@ de continuer à travailler dans ce format
 
 ```{code-cell} ipython3
 # votre code
-data3 = ...
+data3 = np.empty(int(np.floor(len(data)*2/3)))
+data3[::2] = data[::3]
+data3[1::2] = (data[1::3] + data[2::3]) / 2 
 ```
 
 ```{code-cell} ipython3
@@ -1079,13 +1081,13 @@ data3 = ...
 # ces deux segments correspondent normalement
 # au même instant dans le morceau
 
-#data[12000:12007], data3[8000:8005]
+data[12000:12007], data3[8000:8005]
 ```
 
 ```{code-cell} ipython3
 # pour écouter
 
-# MyAudio(data3)
+MyAudio(data3)
 ```
 
 +++ {"tags": ["level_intermediate"]}
