@@ -158,10 +158,7 @@ rectangle_size(10)
 ````
 
 ```{code-cell} ipython3
-# votre code 
-
-def patchwork(colors, side=10, background=[169, 169, 169]):
-    """
+"""
     - colors is expected to be a list of n colors; it can be either
       * a list like e.g. [[255, 0, 0], [0, 255, 0], ... ]
       * or a numpy array of shape n, 3
@@ -169,17 +166,19 @@ def patchwork(colors, side=10, background=[169, 169, 169]):
     - optional background it used to pad the rest of the image when
       the <n> colors are not enough to fill a rectangle
       here we use DarkGray as the default
-    """
+"""
     # your code here
+def patchwork(colors, side=10, background=[169, 169, 169]):
     n = len(colors)
-    colors1 = np.empty((n + 1,3), dtype=np.uint8)
-    colors1[:n] = colors
-    colors1[n] = background
-    (i,j) = rectangle_size(n)
-    pattern = np.arange(i*j).reshape((i,j))
+    colors_arr = np.array(colors, dtype=np.uint8)
+    bg_arr = np.array(background, dtype=np.uint8).reshape(1, 3)
+    colors1 = np.vstack([colors_arr, bg_arr])
+    i, j = rectangle_size(n)
+    pattern = np.arange(i * j).reshape((i, j))
     pattern = np.where(pattern >= n, n, pattern)
-    pattern = pattern.astype(np.uint8)
-    plt.imshow(colors1[pattern])
+    small_image = colors1[pattern]
+    full_image = np.repeat(np.repeat(small_image, side, axis=0), side, axis=1)
+    return full_image
 ```
 
 ```{code-cell} ipython3
@@ -306,7 +305,7 @@ m = np.random.randint(len(color_dict))
 lst_couleur = np.random.randint(0, len(color_dict), m)
 cle = list(color_dict.keys())
 color_names3 = np.array([cle[i] for i in lst_couleur])
-patchwork2(color_names3, side=10, background="DarkGray")
+plt.imshow(patchwork2(color_names3, side=10, background="DarkGray"))
 ```
 
 5. Sélectionnez toutes les couleurs à base de blanc (i.e. dont le nom contient `white`) et affichez leur patchwork  
@@ -322,7 +321,7 @@ patchwork2(color_names4, side=10, background="DarkGray")
 for elt in cle:
     if "yellow" in elt.lower():
         color_names4.append(elt)
-patchwork2(color_names4, side=10, background="DarkGray")
+plt.imshow(patchwork2(color_names4, side=10, background="DarkGray"))
 ```
 
 6. Appliquez la fonction à toutes les couleurs du fichier  
@@ -330,6 +329,7 @@ et sauver ce patchwork dans le fichier `patchwork.png` avec `plt.imsave`
 
 ```{code-cell} ipython3
 img = patchwork2(cle, side=10, background="DarkGray")
+plt.imshow(img)
 plt.imsave("patchwork.png", img)
 ```
 
@@ -489,8 +489,8 @@ plt.show()
 
 ```{code-cell} ipython3
 # votre code / explication
-La méthode consistant à faire rouge + vert + bleu aboutira en cas de dépassement à un entier modulo 256 à cause de l'encodage uint8. On a donc des zones sombres indésirables.
-Cependant, pour la méthode np.sum, le nombre final sera convertit sur 32 bits en cas de dépassement, on a ainsi des zones très blanches, mais un cintraste très élevé en sortie.
+"La méthode consistant à faire rouge + vert + bleu aboutira en cas de dépassement à un entier modulo 256 à cause de l'encodage uint8. On a donc des zones sombres indésirables."
+"Cependant, pour la méthode np.sum, le nombre final sera convertit sur 32 bits en cas de dépassement, on a ainsi des zones très blanches, mais un cintraste très élevé en sortie."
 ```
 
 6. Passez l'image en niveaux de gris de type entiers non-signés 8 bits  
@@ -580,8 +580,8 @@ Que constatez-vous ?
 7. Relisez les deux fichiers créés et affichez avec `plt.imshow` leur différence
 
 ```{code-cell} ipython3
-img_png = plt.imread("img4.png")
-img_jpg = plt.imread("img5.jpg")
+img_jpg = plt.imread("img4.jpg")
+img_png = plt.imread("img5.png")
 if img_png.dtype != np.uint8:
     img_png = (img_png[:, :, :3] * 255).astype(float)
 else:
