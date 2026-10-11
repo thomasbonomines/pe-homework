@@ -327,6 +327,17 @@ see the appendix on weighting by population for a better way
 :tags: [level_basic]
 
 # your code
+df.groupby('region')['life_exp'].mean()
+```
+
+```{code-cell} ipython3
+dfgroup = df.groupby(['region', 'decade'])['life_exp'].mean()
+dfgroup
+```
+
+```{code-cell} ipython3
+print(df.groupby(['region', 'decade'])['life_exp'].mean().index.levels)
+"Les index sont les couples issus d'un produit carthésien (region, decade), avec levels on obtient les deux listes dont sont issues le produit carthésien"
 ```
 
 ## pivot_table
@@ -339,6 +350,7 @@ build a table with one row per region, one column per decade, and the average li
 :tags: [level_basic]
 
 # your code
+dfpivot = df.pivot_table(values = 'life_exp', columns = 'decade', index = 'region', aggfunc = 'mean')
 ```
 
 ## stack and unstack
@@ -353,6 +365,8 @@ use `unstack()` on the former to obtain the latter, and check that they are equa
 :tags: [level_basic]
 
 # your code
+dfunstack = dfgroup.unstack()
+print(pd.testing.assert_frame_equal(dfunstack, dfpivot, check_exact=False, check_like=True))
 ```
 
 and conversely, what does `stack()` do when applied on the pivot table ?
@@ -361,6 +375,9 @@ and conversely, what does `stack()` do when applied on the pivot table ?
 :tags: [level_basic]
 
 # your code
+dfpivot
+dfpivot.stack()
+"Cette fonction empile la table pour lui donner la meme apparence que dfgroup"
 ```
 
 so, in a nutshell: `pivot_table(index=A, columns=B, values=C)` is the same as `groupby([A, B])[C].mean().unstack()`  
@@ -399,6 +416,9 @@ the result should look like this
 :tags: [level_basic]
 
 # your code
+pivoted = pivoted = df.pivot_table(values='life_exp', index='region', columns='decade', aggfunc='mean')
+pivoted= pivoted.T
+pivoted.plot()
 ```
 
 2. now a bar chart (`kind="barh"` or `df.plot.barh()`) of the average life expectancy per region for the most recent decade only (the column `2020`)
@@ -407,6 +427,7 @@ the result should look like this
 :tags: [level_basic]
 
 # your code
+pivoted.loc[2020].plot.barh()
 ```
 
 3. finally, a scatter plot of `life_exp` against `gdp_per_capita` for year 2019, using `df.plot.scatter()`  
@@ -416,6 +437,8 @@ use a log scale on the x axis (`logx=True`) to make it readable
 :tags: [level_basic]
 
 # your code
+dfplot2 = df[df['year'] == 2019]
+dfplot2.plot.scatter(x='life_exp', y='gdp_per_capita', logx = True);
 ```
 
 ## pairplot
@@ -443,6 +466,14 @@ you should produce something like this:
 :tags: [level_basic]
 
 # your code
+import seaborn as sns
+sns.pairplot(data=dfplot2,vars=['life_exp', 'gdp_per_capita', 'population'], hue='region')
+```
+
+```{code-cell} ipython3
+dfplot2['log_gdp'] = np.log10(dfplot2['gdp_per_capita'])
+dfplot2['log_pop'] = np.log10(dfplot2['population'])
+sns.pairplot(data=dfplot2,vars=['life_exp', 'log_gdp', 'log_pop'], hue='region')
 ```
 
 ## optional: going further
@@ -463,6 +494,8 @@ and what about regions that have no country in some income level ?
 :tags: [level_basic]
 
 # your code
+income = df.pivot_table(index='region',columns='income_level',values='country_code',aggfunc='nunique')
+income
 ```
 
 ## appendix: weighting by population
@@ -487,6 +520,12 @@ so compute these two sums by (region, decade), and divide them
 :tags: [level_basic]
 
 # your code
+df = df.assign(life_x_pop=df['life_exp'] * df['population'])
+df = df.dropna(subset=['life_exp', 'population'])
+somme = df.groupby(['region', 'decade'])[['life_x_pop', 'population']].sum()
+moy = somme['life_x_pop'] / somme['population']
+moy = moy.unstack()
+moy
 ```
 
 ## appendix: where does the data come from
